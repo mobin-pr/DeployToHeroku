@@ -1,5 +1,2 @@
-future>=0.16.0
-certifi
-tornado>=5.1
-cryptography
-python-telegram-bot
+deep-translator==1.5.4 
+Pyrogram==1.2.9

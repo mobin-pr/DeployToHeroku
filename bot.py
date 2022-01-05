@@ -1,58 +1,106 @@
-from telegram import Update,ReplyKeyboardMarkup,ReplyKeyboardRemove,Bot,InlineKeyboardButton,InlineKeyboardMarkup,KeyboardButton,CallbackQuery,ParseMode
-from telegram.ext import CommandHandler,Updater,Dispatcher,MessageHandler,Filters,CallbackContext,CallbackQueryHandler
-import logging
+from pyrogram import *
+from typing import Text
+from pyrogram import *
+from deep_translator import MyMemoryTranslator
+from pyrogram.filters import Filter, chat
+from pyrogram.methods.messages import send_message
+from pyrogram.types import ChatPermissions
+from time import time
 
-# Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+from pyrogram.types.messages_and_media import message
 
-logger = logging.getLogger(__name__)
+app = Client("translate",
+    api_id=5527711,
+    api_hash='bfe9610f27c9298bbae60d066d11c5e7',
+    bot_token='1670124420:AAF9g-ka_nDqbFFXNPkMNUW-sx8-KiQrjLA',
+    )
 
-tkn = "Your Bot Token"
-updater = Updater(tkn,use_context=True)
-bot = Bot(tkn)
-dispatcher : Dispatcher = updater.dispatcher
+@app.on_message(filters.command('start'))
+async def start(clinet,message):
+    await message.reply('h')
 
-def start(update:Update, context:CallbackContext):
-    firstname = update.effective_message.from_user.first_name
-    chtiD = update.effective_message.chat_id
-    username = update.effective_message.from_user.username
-    txt = update.effective_message.text
-    keyboard = [
-        [KeyboardButton('Help')],
-        [KeyboardButton('Contact us')]
-    ]
-    key = ReplyKeyboardMarkup(keyboard,resize_keyboard=True)
+@app.on_message(filters.command(['kick']))
+async def kick(client,message):
+    chat_id = message.chat.id
+    user_id = message.reply_to_message.from_user.id
+    await client.kick_chat_member(chat_id,user_id)
+    await message.reply('ریمو شد')
 
+@app.on_message(filters.command(['pin']))
+async def pins(client,message):
+    chat_id = message.chat.id
+    message_id = message.reply_to_message.message_id
+    await client.pin_chat_message(chat_id, message_id)
+    await message.reply('پین شد')
 
-    if txt=="Help":
-        bot.send_message(
-            chat_id=chtiD,
-            text="How to Deploy Your Telegram bot on Heroku\n\nچگونه ربات خود را در Heroku راه اندازی کنید",
-            reply_to_message_id=update.effective_message.message_id,
-        )
-    elif txt=="Contact us":
-        bot.send_message(
-            chat_id=chtiD,
-            text="<u>Website : </u>Rexxar.ir\n\n<i>Telegram : </i>@Rexxar_ir",
-            reply_to_message_id=update.effective_message.message_id,
-            parse_mode=ParseMode.HTML
-        )
-    else:
-        bot.send_message(
-            chat_id=chtiD,
-            text=f"نام کاربری شما {firstname}" + f"\n\nیوزرنیم شما : {username}" + f"\n\nآیدی عددی شما : {str(chtiD)}",
-            reply_to_message_id=update.effective_message.message_id,
-            reply_markup=key
+@app.on_message(filters.command(['bon']))
+async def bon(client,message):
+    chat_id = message.chat.id
+    user_id = message.reply_to_message.from_user.id
+    await client.restrict_chat_member(chat_id, user_id, ChatPermissions(), int(time() + 60))
+    await message.reply('بن شد')
+# unpin
+@app.on_message(filters.command(['unpins']))
+async def unpins(client,message):
+    chat_id = message.chat.id
+    await client.unpin_all_chat_messages(chat_id)
 
+# welcome
+@app.on_message(filters.new_chat_members)
+async def new_chat(client, message):
+    chatt = ''
+    for i in message.new_chat_members:
+        chatt += f"{i.first_name}"
+    await message.reply(f'سلام {chatt} خوش آمدی به گروه ما')
 
-        )
-
-def main():
-
-    dispatcher.add_handler(MessageHandler(Filters.text,start))
-    updater.start_polling()
+# left
+@app.on_message(filters.left_chat_member)
+async def left_chat(client, message):
+    await message.reply(f'به کیرم {message.left_chat_member.first_name}')
 
 
-if __name__ == '__main__':
-    main()
+
+
+
+channel_1 = -1001410119352
+channel_2 = -1001635050190
+@app.on_message(filters=chat(channel_1)|filters.command('send'))
+async def forward():
+    await client.forward_messages(chat_id=channel_2,from_chat_id=message.chat.id,message_ids = message.message_id)
+
+
+
+
+@app.on_message(filters.text, group = 2)
+async def tr(client, message):
+    text = message.text
+    if text.startswith('/tr '):
+        text = text.replace('/tr ', '')
+        tr = MyMemoryTranslator(source= 'en', target= 'fa')
+        tr = tr.translate(text)
+        await message.reply(tr)
+
+
+@app.on_message(filters.text, group=1)
+async def trf(client, message):
+    text = message.text
+    if text.startswith('/trf '):
+        text = text.replace('/trf ', '')
+        trf = MyMemoryTranslator(source= 'fa', target= 'en')
+        trf = trf.translate(text)
+        await message.reply(trf)
+
+@app.on_message(filters.text, group=8)
+async def trr(client, message):
+    
+    text = (message.text).lower()
+    
+    if (text.startswith('trr') or text.startswith('trf') or text.startswith('tr') or text.startswith('/trr') or text.startswith('/trf') or text.startswith('/tr') or text.startswith('/tr@samyarborderbot') or text.startswith("'/trr@samyarborderbot'") or text.startswith("'/trf@samyarborderbot'") ) and message.reply_to_message:
+       trf = MyMemoryTranslator(source= 'en', target= 'fa')
+       trf = trf.translate(message.reply_to_message.text)
+       await message.reply(trf) 
+       tr= MyMemoryTranslator(source= 'fa', target= 'en')
+       tr = tr.translate(message.reply_to_message.text)
+       await message.reply(tr)
+
+app.run()
