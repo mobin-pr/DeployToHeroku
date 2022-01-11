@@ -16,7 +16,7 @@ app = Client("translate",
     )
 
 # start
-@app.on_message(filters.command('start'|'start@two1two_bot'))
+@app.on_message(filters.command(['start'|'start@two1two_bot']))
 async def start(clinet,message):
     await message.reply("""
     سلام برای اطلاع از دستورات از 
