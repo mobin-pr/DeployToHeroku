@@ -6,7 +6,7 @@ from pyrogram.filters import Filter, chat
 from pyrogram.methods.messages import send_message
 from pyrogram.types import ChatPermissions
 from time import time
-
+import requests
 from pyrogram.types.messages_and_media import message
 
 app = Client("translate",
@@ -15,35 +15,71 @@ app = Client("translate",
     bot_token='1670124420:AAF9g-ka_nDqbFFXNPkMNUW-sx8-KiQrjLA',
     )
 
+# start
 @app.on_message(filters.command('start'))
 async def start(clinet,message):
-    await message.reply('h')
+    await message.reply("""
+    سلام برای اطلاع از دستورات از 
+    /helps
+    استفاده کنید
+    """)
+# help
+@app.on_message(filters.command('helps'))
+async def helps(client,message):
+    await message.reply("""
+    /start
+    /helps
+    /tr [text]   => en to fa
+    /trf [text]  => fa to en
+    /day
+    (admin)
+    /kick
+    /bon
+    /unbon
+    /pin
+    /unpin
+    """)
+# download profile instagram
+@app.on_message(filters.command('day'))
+async def day(client,message):
+    response = requests.get("https://api.shelper.ir/monasebat.php")
+    gets = response.json()[0]['occasion']
+    await message.reply(gets)
 
-@app.on_message(filters.command(['kick']))
+# kick
+@app.on_message(filters.command('kick')|filters.user('742297528'))
 async def kick(client,message):
     chat_id = message.chat.id
     user_id = message.reply_to_message.from_user.id
     await client.kick_chat_member(chat_id,user_id)
     await message.reply('ریمو شد')
-
-@app.on_message(filters.command(['pin']))
+#pin
+@app.on_message(filters.command('pin'))
 async def pins(client,message):
     chat_id = message.chat.id
     message_id = message.reply_to_message.message_id
     await client.pin_chat_message(chat_id, message_id)
     await message.reply('پین شد')
-
-@app.on_message(filters.command(['bon']))
+#pin
+@app.on_message(filters.command('bon')|filters.user('742297528'))
 async def bon(client,message):
     chat_id = message.chat.id
     user_id = message.reply_to_message.from_user.id
     await client.restrict_chat_member(chat_id, user_id, ChatPermissions(), int(time() + 60))
     await message.reply('بن شد')
+#unbon
+@app.on_message(filters.command('unbon')|filters.user('742297528'))
+async def bon(client,message):
+    chat_id = message.chat.id
+    user_id = message.reply_to_message.from_user.id
+    await client.unban_chat_member(chat_id, user_id)
+    await message.reply('از بن خارج شد')
 # unpin
-@app.on_message(filters.command(['unpins']))
+@app.on_message(filters.command('unpin')|filters.user('742297528'))
 async def unpins(client,message):
     chat_id = message.chat.id
     await client.unpin_all_chat_messages(chat_id)
+
 
 # welcome
 @app.on_message(filters.new_chat_members)
@@ -58,19 +94,7 @@ async def new_chat(client, message):
 async def left_chat(client, message):
     await message.reply(f'به کیرم {message.left_chat_member.first_name}')
 
-
-
-
-
-channel_1 = -1001410119352
-channel_2 = -1001635050190
-@app.on_message(filters=chat(channel_1)|filters.command('send'))
-async def forward():
-    await client.forward_messages(chat_id=channel_2,from_chat_id=message.chat.id,message_ids = message.message_id)
-
-
-
-
+# tran to en to fa 
 @app.on_message(filters.text, group = 2)
 async def tr(client, message):
     text = message.text
@@ -79,7 +103,6 @@ async def tr(client, message):
         tr = MyMemoryTranslator(source= 'en', target= 'fa')
         tr = tr.translate(text)
         await message.reply(tr)
-
 
 @app.on_message(filters.text, group=1)
 async def trf(client, message):
