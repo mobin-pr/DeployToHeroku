@@ -16,7 +16,7 @@ app = Client("translate",
     )
 
 # start
-@app.on_message(filters.command('start'))
+@app.on_message(filters.command('start'|'start@two1two_bot'))
 async def start(clinet,message):
     await message.reply("""
     سلام برای اطلاع از دستورات از 
@@ -24,7 +24,7 @@ async def start(clinet,message):
     استفاده کنید
     """)
 # help
-@app.on_message(filters.command('helps'))
+@app.on_message(filters.command('helps'|'helps@two1two_bot'))
 async def helps(client,message):
     await message.reply("""
     /start
@@ -40,42 +40,42 @@ async def helps(client,message):
     /unpin
     """)
 # download profile instagram
-@app.on_message(filters.command('day'))
+@app.on_message(filters.command('day'|'day@two1two_bot'))
 async def day(client,message):
     response = requests.get("https://api.shelper.ir/monasebat.php")
     gets = response.json()[0]['occasion']
     await message.reply(gets)
 
 # kick
-@app.on_message(filters.command('kick')|filters.user('742297528'))
+@app.on_message(filters.command('kick'|'kick@two1two_bot')|filters.user('742297528'))
 async def kick(client,message):
     chat_id = message.chat.id
     user_id = message.reply_to_message.from_user.id
     await client.kick_chat_member(chat_id,user_id)
     await message.reply('ریمو شد')
 #pin
-@app.on_message(filters.command('pin'))
+@app.on_message(filters.command('pin'|'pin@two1two_bot'))
 async def pins(client,message):
     chat_id = message.chat.id
     message_id = message.reply_to_message.message_id
     await client.pin_chat_message(chat_id, message_id)
     await message.reply('پین شد')
 #pin
-@app.on_message(filters.command('bon')|filters.user('742297528'))
+@app.on_message(filters.command('bon'|'bon@two1two_bot')|filters.user('742297528'))
 async def bon(client,message):
     chat_id = message.chat.id
     user_id = message.reply_to_message.from_user.id
     await client.restrict_chat_member(chat_id, user_id, ChatPermissions(), int(time() + 60))
     await message.reply('بن شد')
 #unbon
-@app.on_message(filters.command('unbon')|filters.user('742297528'))
+@app.on_message(filters.command('unbon'|'unbon@two1two_bot')|filters.user('742297528'))
 async def bon(client,message):
     chat_id = message.chat.id
     user_id = message.reply_to_message.from_user.id
     await client.unban_chat_member(chat_id, user_id)
     await message.reply('از بن خارج شد')
 # unpin
-@app.on_message(filters.command('unpin')|filters.user('742297528'))
+@app.on_message(filters.command('unpin'|'unpin@two1two_bot')|filters.user('742297528'))
 async def unpins(client,message):
     chat_id = message.chat.id
     await client.unpin_all_chat_messages(chat_id)
